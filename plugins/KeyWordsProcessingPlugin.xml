@@ -5,11 +5,7 @@
 	<classLocation/>
 	<className>sk.fiit.rabbit.adaptiveproxy.plugins.services.keywords.KeyWordsProcessingPlugin</className>
 	<libraries>
-	  	<lib>log4j-zeroconf.jar</lib>
 	  	<lib>log4j-1.2.15.jar</lib>
-	  	<lib>jsoup-0.3.1-sources.jar</lib>
-	  	<lib>jsoup-0.3.1-javadoc.jar</lib>
-	  	<lib>jsoup-0.3.1.jar</lib>
 	  	<lib>json-lib-2.4-jdk15.jar</lib>
 	  	<lib>json_simple-1.1.jar</lib>
 	  	<lib>gson-1.4.jar</lib>
