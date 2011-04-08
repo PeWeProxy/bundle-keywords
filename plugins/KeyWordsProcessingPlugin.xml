@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "PluginConfiguration.dtd">
+<plugin>
+	<name>KeyWordsProcessingPlugin</name>
+	<classLocation/>
+	<className>sk.fiit.rabbit.adaptiveproxy.plugins.services.keywords.KeyWordsProcessingPlugin</className>
+	<libraries>
+	  	<lib>log4j-zeroconf.jar</lib>
+	  	<lib>log4j-1.2.15.jar</lib>
+	  	<lib>jsoup-0.3.1-sources.jar</lib>
+	  	<lib>jsoup-0.3.1-javadoc.jar</lib>
+	  	<lib>jsoup-0.3.1.jar</lib>
+	  	<lib>json-lib-2.4-jdk15.jar</lib>
+	  	<lib>json_simple-1.1.jar</lib>
+	  	<lib>gson-1.4.jar</lib>
+	  	<lib>couchdb4j-0.1.2.jar</lib>
+	</libraries>
+	<types>
+		<type>RequestProcessingPlugin</type>
+		<type>ResponseProcessingPlugin</type>
+	</types>
+	<parameters>
+		<param name="bypassPattern">adaptive-proxy/key_words_call</param>
+		<param name="generateResponse">true</param>
+		<param name="scriptUrl">${plugins-core:proxyurl}/FileSender/public/peweproxy_keywords.js</param>
+						<param name="menuWindowHTML">
+<![CDATA[
+	<style type="text/css">
+				a.__peweproxy_keywords_button{
+					background-image:url("${plugins-core:proxyurl}/FileSender/public/keywordsImages/icon_keywords.png");
+					display:block;
+					float:left;
+					height:21px;
+					margin-left:5px;
+					margin-top:2px;
+					width:16px;
+				}
+			
+				div#peweproxy_keywords{
+					position: absolute;
+					top: 0;
+					right: 0;
+					width: 433px;
+					display:none;
+				}
+
+				div#peweproxy_keywords div{
+					clear: both;
+				}
+
+				div.__peweproxy_keywords_head{
+					height: 26px;
+					width: 433px;
+					background-image: url('${plugins-core:proxyurl}/FileSender/public/keywordsImages/keywords_top.png');
+					float: left;
+				}
+
+				div.__peweproxy_keywords_body{
+					background-image:url("${plugins-core:proxyurl}/FileSender/public/keywordsImages/keywords_body.png");
+					float:left;
+					padding:0 20px 0 16px;
+					width:397px;
+				}
+
+				div.__peweproxy_keywords_foot{
+					height: 15px;
+					width: 433px;
+					background-image: url('${plugins-core:proxyurl}/FileSender/public/keywordsImages/keywords_bottom.png');
+					float: left;
+				}
+
+				a.__peweproxy_keywords_closebutton{
+					display: block;
+					position: absolute;
+					right: 1px;
+					top: 1px;
+					height: 22px;
+					width: 22px;
+					background-image: url('${plugins-core:proxyurl}/FileSender/public/keywordsImages/close_button.png');
+					background-position: top;
+				}
+
+				a.__peweproxy_keywords_closebutton:hover{
+					background-position: bottom;
+				}
+
+				div#peweproxy_keywords_content{
+					width: 397px;
+				}
+				div#peweproxy_keywords_content table {
+					color: #2F3F4F;
+				}
+				div#peweproxy_keywords_content table th{
+					background-color: #d2d28b;
+				}
+				div#peweproxy_keywords_content table td, div#peweproxy_keywords_content table th{
+					border-left: 2px solid #fcfcec;
+				}
+				div#peweproxy_keywords_content table tr.odd td{
+					background-color: #f6f6c2;
+				}
+				div#peweproxy_keywords_content table a img{
+					border: none;
+				}
+				div#peweproxy_keywords_content table{
+					border-collapse: collapse;
+				}
+				div#peweproxy_keywords_content table input{
+					border: 1px solid #78731e;
+					font-family: 'Trebuchet MS', Tahoma, Arial;
+					font-size: 12px;
+					height: 17px;
+					color: #5F5F5F;
+				}
+				div#peweproxy_keywords_content table input.term{
+					width: 173px;
+				}
+				div#peweproxy_keywords_content table input.type{
+					width: 50px;
+				}
+				div#peweproxy_keywords_content table input.relevance{
+					width: 40px;
+				}
+				div#peweproxy_keywords_content table span.editable{
+					display:none;
+				}
+				form#peweproxy_keywords_add_form div{
+					border-top: 1px solid #d2d28b;
+					margin-top: 5px;
+					padding-top: 5px;
+				}
+				form#peweproxy_keywords_add_form p{
+					margin: 0;
+				}
+				form#peweproxy_keywords_add_form input{
+					border: 1px solid #78731e;
+					font-family: 'Trebuchet MS', Verdana, Tahoma, Arial;
+					font-size: 12px;
+					color: #2F2F2F;
+				}
+				form#peweproxy_keywords_add_form input.submit{
+					background-color: #fff993;
+					border: 1px solid #999241;
+					color: #2F2F2F;
+				}
+				div#peweproxy_keywords_content table tr td.buttons a{
+					margin-left: 5px;
+				}
+			</style>
+
+			<script type="text/javascript">
+				var peweproxy_keywords_htdocs_dir = '${plugins-core:proxyurl}/FileSender/public/keywordsImages';
+			</script>
+
+			<div id="peweproxy_keywords">
+				<div class="__peweproxy_keywords_head">
+					<a class="__peweproxy_keywords_closebutton" href="#"></a>
+				</div>
+
+				<div class="__peweproxy_keywords_body">
+					<div>
+						<span class="header">
+							<span class="left_floated">Kľúčové slová stránky</span>
+							<span class="right_floated language_bar"><a href="#" class="active" onclick="return false;">SK</a> | <a onclick="return false;" href="#">EN</a></span>
+						</span>
+					</div>
+					<div id="peweproxy_keywords_content">
+						<div class="__peweproxy_keyword">
+							<table>
+								<tr>
+									<th style="width: 179px">Kľúčové slovo</th>
+									<th style="width: 56px">Typ</th>
+									<th style="width: 43px">Váha</th>
+									<th style="width: 57px">Zdroj</th>
+									<th style="width: 46px">Akcie</th>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<form id="peweproxy_keywords_add_form" action="">
+						<div>
+							<p>Pridať kľúčové slovo</p>
+							<input type="text" style="width:170px" name="term" value="Slovo" id="peweproxy_keywords_add_term" onfocus="if (this.value=='Slovo') this.value = ''" onblur="if (this.value == '') this.value = 'Slovo'" />
+							<input type="text" style="width:55px" name="type" value="Typ" id="peweproxy_keywords_add_type" onfocus="if (this.value=='Typ') this.value = ''" onblur="if (this.value == '') this.value = 'Typ'" />
+							<input type="text" style="width:40px" name="relevance" value="Váha" id="peweproxy_keywords_add_relevance" onfocus="if (this.value=='Váha') this.value = ''" onblur="if (this.value == '') this.value = 'Váha'" />
+							<input type="submit" value="Pridať" class="submit" />
+						</div>
+					</form>
+				</div>
+				<div class="__peweproxy_keywords_foot"></div>
+			</div>
+]]>
+		</param>
+		<param name="menuButtonHTML">
+<![CDATA[
+	<a href="#" class="__peweproxy_keywords_button"></a>
+]]>
+		</param>
+	</parameters>
+</plugin>
