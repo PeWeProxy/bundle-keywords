@@ -17,14 +17,14 @@ import sk.fiit.peweproxy.services.content.ModifiableStringService;
 import sk.fiit.peweproxy.services.content.StringContentService;
 import sk.fiit.rabbit.adaptiveproxy.plugins.servicedefinitions.DatabaseConnectionProviderService;
 import sk.fiit.rabbit.adaptiveproxy.plugins.servicedefinitions.DatabaseSessionProviderService;
+import sk.fiit.rabbit.adaptiveproxy.plugins.services.bubble.BubbleMenuProcessingPlugin;
 import sk.fiit.rabbit.adaptiveproxy.plugins.services.common.SqlUtils;
-import sk.fiit.rabbit.adaptiveproxy.plugins.services.injector.ClientBubbleMenuProcessingPlugin;
 
 import com.fourspaces.couchdb.Database;
 import com.fourspaces.couchdb.Document;
 
 
-public class KeyWordsProcessingPlugin  extends ClientBubbleMenuProcessingPlugin {
+public class KeyWordsProcessingPlugin extends BubbleMenuProcessingPlugin {
 	
 	
 	@Override
