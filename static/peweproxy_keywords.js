@@ -1,4 +1,4 @@
-var peweproxy_url_keywords = 'adaptive-proxy/key_words_call.html'
+var peweproxy_url_keywords = 'adaptive-proxy/key_words_call'
 
 var temp = function($) {
 	$(document).ready(function(){
@@ -20,7 +20,7 @@ var temp = function($) {
 		});
 		$('form#peweproxy_keywords_add_form').submit(function(){
 			post_data = $(this).serialize();
-			$.post(peweproxy_url_keywords+'?action=addKeyWord',post_data+'&checksum='+page_uid,function(data){
+			$.post(peweproxy_url_keywords+'?action=addKeyWord',post_data,function(data){
 				response = $.trim(data);
 				if (response == 'OK'){
 					peweproxy_get_keywords();
@@ -108,23 +108,23 @@ function peweproxy_get_keywords(){
 						'</td>'+
 					'</tr>';
 	var temp = function($) {
-		$.post(peweproxy_url_keywords+'?action=getKeyWords','checksum='+page_uid,function(data){
+		$.get(peweproxy_url_keywords+'?action=getKeyWords',function(data){
 			keywords = eval('('+data+')');
 			table = $('div#peweproxy_keywords_content table');
 			table.find("tr.keyword_row").remove();
-			for (var keyword in keywords.keywords){
-			  if (keywords.keywords[keyword].label == undefined) continue;
+			$.each(keywords.keywords, function() {
+			    if (this.name == undefined) return;
 				
-				if (keywords.keywords[keyword].term_type == undefined) keywords.keywords[keyword].term_type = "";
-				if (keywords.keywords[keyword].relevance == undefined) keywords.keywords[keyword].relevance = "";
+				if (this.type == undefined) this.type = "";
+				if (this.relevance == undefined) this.relevance = "";
 				
-				row = template.replace(/\[:id:\]/g, keywords.keywords[keyword].label);
-				row = row.replace(/\[:term:\]/g, keywords.keywords[keyword].label);
-				row = row.replace(/\[:type:\]/g, keywords.keywords[keyword].term_type);
-				row = row.replace(/\[:relevance:\]/g, keywords.keywords[keyword].relevance);
-				row = row.replace(/\[:source:\]/g, keywords.keywords[keyword].source);
+				row = template.replace(/\[:id:\]/g, this.name);
+				row = row.replace(/\[:term:\]/g, this.name);
+				row = row.replace(/\[:type:\]/g, this.type);
+				row = row.replace(/\[:relevance:\]/g, this.relevance);
+				row = row.replace(/\[:source:\]/g, this.source);
 				table.append(row);
-			}
+			});
 			$('div#peweproxy_keywords_content table tr:even').addClass('odd');
 		})
 	} (adaptiveProxyJQuery);

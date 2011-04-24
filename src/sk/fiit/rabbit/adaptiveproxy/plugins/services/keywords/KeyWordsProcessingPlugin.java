@@ -1,12 +1,10 @@
 package sk.fiit.rabbit.adaptiveproxy.plugins.services.keywords;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.sql.Connection;
-import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.jcouchdb.db.Database;
 import org.json.simple.JSONObject;
 
 import sk.fiit.peweproxy.messages.HttpMessageFactory;
@@ -14,49 +12,37 @@ import sk.fiit.peweproxy.messages.HttpResponse;
 import sk.fiit.peweproxy.messages.ModifiableHttpRequest;
 import sk.fiit.peweproxy.messages.ModifiableHttpResponse;
 import sk.fiit.peweproxy.services.content.ModifiableStringService;
-import sk.fiit.peweproxy.services.content.StringContentService;
-import sk.fiit.rabbit.adaptiveproxy.plugins.servicedefinitions.DatabaseConnectionProviderService;
-import sk.fiit.rabbit.adaptiveproxy.plugins.servicedefinitions.DatabaseSessionProviderService;
+import sk.fiit.rabbit.adaptiveproxy.plugins.servicedefinitions.CouchDBProviderService;
+import sk.fiit.rabbit.adaptiveproxy.plugins.servicedefinitions.PostDataParserService;
 import sk.fiit.rabbit.adaptiveproxy.plugins.services.bubble.BubbleMenuProcessingPlugin;
-import sk.fiit.rabbit.adaptiveproxy.plugins.services.common.SqlUtils;
-
-import com.fourspaces.couchdb.Database;
-import com.fourspaces.couchdb.Document;
-
 
 public class KeyWordsProcessingPlugin extends BubbleMenuProcessingPlugin {
 	
-	
 	@Override
 	public HttpResponse getResponse(ModifiableHttpRequest request, HttpMessageFactory messageFactory) {
-		StringContentService stringContentService = request.getServicesHandle().getService(StringContentService.class);
-		String pageId = "569d223f-fd9b-493c-a973-57b460c4ec45";
-		
-		Map<String, String> postData = getPostDataFromRequest(stringContentService.getContent());
 		String content = "";
-		Connection connection = null;
-		Database database = null;
-		try {
-			connection = request.getServicesHandle().getService(DatabaseConnectionProviderService.class).getDatabaseConnection();
-			database = request.getServicesHandle().getService(DatabaseSessionProviderService.class).getDatabase();
-			//String pageId = postData.get("checksum");
+
+		if(request.getServicesHandle().isServiceAvailable(CouchDBProviderService.class)) {
+			Database database = request.getServicesHandle().getService(CouchDBProviderService.class).getDatabase();
+			String url = request.getRequestHeader().getField("Referer");
 			
 			if (request.getRequestHeader().getRequestURI().contains("action=getKeyWords")) {
-				content = this.getKeyWordsFromCouchDb(database, pageId, request.getRequestHeader().getField("Referer"));
+				content = this.getKeyWordsFromCouchDb(database, url);
 			}
-			if (request.getRequestHeader().getRequestURI().contains("action=editKeyWord")) {
-				content = this.editKeyWordInCouchDb(database, pageId, postData.get("id"), postData.get("term"), postData.get("relevance"), postData.get("type"));
+			
+			if(request.getServicesHandle().isServiceAvailable(PostDataParserService.class)) {
+				Map<String, String> postData = request.getServicesHandle().getService(PostDataParserService.class).getPostData();
+				if (request.getRequestHeader().getRequestURI().contains("action=editKeyWord")) {
+					content = this.editKeyWordInCouchDb(database, url, postData.get("id"), postData.get("term"), postData.get("relevance"), postData.get("type"));
+				}
+				if (request.getRequestHeader().getRequestURI().contains("action=removeKeyWord")) {
+					content = this.removeKeyWordFromCouchDb(database, url, postData.get("id"));
+				}
+				if (request.getRequestHeader().getRequestURI().contains("action=addKeyWord")) {
+					content = this.addKeyWordIntoCouchDb(database, url, postData.get("term"), postData.get("relevance"), postData.get("type"));
+				}
 			}
-			if (request.getRequestHeader().getRequestURI().contains("action=removeKeyWord")) {
-				content = this.removeKeyWordFromCouchDb(database, pageId, postData.get("id"));
-			}
-			if (request.getRequestHeader().getRequestURI().contains("action=addKeyWord")) {
-				content = this.addKeyWordIntoCouchDb(database, pageId, postData.get("term"), postData.get("relevance"), postData.get("type"));
-			}
-		} finally {
-			SqlUtils.close(connection);
 		}
-		
 		
 		ModifiableHttpResponse httpResponse = messageFactory.constructHttpResponse(null, "text/html");
 		ModifiableStringService stringService = httpResponse.getServicesHandle().getService(ModifiableStringService.class);
@@ -65,114 +51,75 @@ public class KeyWordsProcessingPlugin extends BubbleMenuProcessingPlugin {
 		return httpResponse;
 	}
 	
-	private String addKeyWordIntoCouchDb(Database database, String pageId, String term, String relevance, String type) {
+	@SuppressWarnings("all")
+	private String addKeyWordIntoCouchDb(Database couch, String url, String name, String relevance, String type) {
 		try {
-			Document doc = database.getDocument(pageId);
-			net.sf.json.JSONObject jsonPageTerm;
-			
-			net.sf.json.JSONArray pages_terms = doc.getJSONArray("pages_terms");
-			JSONObject newTerm = new JSONObject();
-			newTerm.put("label", term);
-			newTerm.put("relevance", relevance);
-			newTerm.put("type", type);
-			newTerm.put("created_at", new Timestamp(System.currentTimeMillis()).toString().substring(0, 10));
-			newTerm.put("updated_at", new Timestamp(System.currentTimeMillis()).toString().substring(0, 10));
-			newTerm.put("source", "human");
-			
-			pages_terms.add(newTerm);
-			doc.put("pages_terms", pages_terms);
-			database.saveDocument(doc);
+			HashMap page = couch.getDocument(HashMap.class, url);
+			List<Map> terms = (List<Map>) page.get("terms");
+			Map term = new HashMap();
+			term.put("name", name);
+			term.put("relevance", relevance);
+			term.put("type", type);
+			term.put("source", "human");
+			terms.add(term);
+			couch.updateDocument(page);
 		} catch (Exception e) {
-			logger.error("Unable to remove key word", e);
+			logger.error("Unable to edit keyword", e);
 			return "FAIL";
 		}
 		return "OK";
-	}
-
-	private String removeKeyWordFromCouchDb(Database database, String pageId, String termId) {
-		try {
-			Document doc = database.getDocument(pageId);
-			net.sf.json.JSONObject jsonPageTerm;
-			
-			net.sf.json.JSONArray pages_terms = doc.getJSONArray("pages_terms");
-			
-			for (Object ptObj : pages_terms) {
-				jsonPageTerm = (net.sf.json.JSONObject)ptObj;
-				
-				if (jsonPageTerm.getString("label").toString().equals(termId)) {
-					pages_terms.remove(ptObj);
-				}
-			}
-			
-			doc.put("pages_terms", pages_terms);
-			database.saveDocument(doc);
-		} catch (Exception e) {
-			logger.error("Unable to remove key word", e);
-			return "FAIL";
-		}
-		return "OK";
-	}
-
-	private String editKeyWordInCouchDb(Database database, String pageId, String termId, String term, String relevance, String type) {
-		try {
-			Document doc = database.getDocument(pageId);
-			net.sf.json.JSONObject jsonPageTerm;
-			
-			net.sf.json.JSONArray pages_terms = doc.getJSONArray("pages_terms");
-			
-			for (Object ptObj : pages_terms) {
-				jsonPageTerm = (net.sf.json.JSONObject)ptObj;
-				
-				if (jsonPageTerm.getString("label").toString().equals(termId)) {
-					if (!"".equals(term) || !(term == null)) {
-						jsonPageTerm.element("label", term);
-					}
-					if (!"".equals(type) || !(type == null)) {
-						jsonPageTerm.element("term_type", type);
-					}
-					if (!"".equals(relevance) || !(relevance == null)) {
-						jsonPageTerm.element("relevance", relevance);
-					}
-					jsonPageTerm.element("updated_at", new Timestamp(System.currentTimeMillis()).toString().substring(0, 10));
-					ptObj = jsonPageTerm;
-				}
-			}
-			
-			doc.put("pages_terms", pages_terms);
-			database.saveDocument(doc);
-		} catch (Exception e) {
-			logger.error("Unable to edit key word", e);
-			return "FAIL";
-		}
-		return "OK";
-	}
-
-	private String getKeyWordsFromCouchDb(Database db, String pageId, String url) {
-		Document doc = db.getDocument(pageId);
-		String jsonString = "{\"keywords\":" + doc.get("pages_terms").toString() + "}";
-
-		return jsonString;
-	}
-
-	private Map<String, String> getPostDataFromRequest (String requestContent) {
-		try {
-			requestContent = URLDecoder.decode(requestContent, "utf-8");
-		} catch (UnsupportedEncodingException e) {
-			logger.warn(e);
-		}
-		Map<String, String> postData = new HashMap<String, String>();
-		String attributeName;
-		String attributeValue;
-
-		for (String postPair : requestContent.split("&")) {
-			if (postPair.split("=").length == 2) {
-				attributeName = postPair.split("=")[0];
-				attributeValue = postPair.split("=")[1];
-				postData.put(attributeName, attributeValue);
-			}
-		}
-
-		return postData;
 	}
 	
+	@SuppressWarnings("all")
+	private String removeKeyWordFromCouchDb(Database couch, String url, String termId) {
+		try {
+			HashMap page = couch.getDocument(HashMap.class, url);
+			List<Map> terms = (List<Map>) page.get("terms");
+			
+			Map termToRemove = null;
+			for(Map term : terms) {
+				if(term.get("name").equals(termId)) {
+					termToRemove = term;
+					break;
+				}
+			}
+			terms.remove(termToRemove);
+			
+			couch.updateDocument(page);
+		} catch (Exception e) {
+			logger.error("Unable to remove keyword", e);
+			return "FAIL";
+		}
+		return "OK";
+	}
+
+	@SuppressWarnings("all")
+	private String editKeyWordInCouchDb(Database couch, String url, String termId, String name, String relevance, String type) {
+		try {
+			HashMap page = couch.getDocument(HashMap.class, url);
+			List<Map> terms = (List<Map>) page.get("terms");
+			for(Map term : terms) {
+				if(term.get("name").equals(termId)) {
+					term.put("name", name);
+					term.put("type", type);
+					term.put("relevance", relevance);
+				}
+			}
+			couch.updateDocument(page);
+		} catch (Exception e) {
+			logger.error("Unable to edit keyword", e);
+			return "FAIL";
+		}
+		return "OK";
+	}
+
+	@SuppressWarnings("all")
+	private String getKeyWordsFromCouchDb(Database couch, String url) {
+		HashMap page = couch.getDocument(HashMap.class, url);
+		
+		JSONObject response = new JSONObject();
+		response.put("keywords", page.get("terms"));
+		
+		return response.toJSONString();
+	}
 }
