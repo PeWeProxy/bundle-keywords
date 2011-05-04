@@ -18,13 +18,13 @@
 	<parameters>
 		<param name="bypassPattern">adaptive-proxy/key_words_call</param>
 		<param name="generateResponse">true</param>
-		<param name="scriptUrl">${plugins-core:proxyurl}/FileSender/public/peweproxy_keywords.js</param>
+		<param name="scriptUrl">${plugins-core:assets-path}/peweproxy_keywords.js</param>
 		<param name="buttonHTML"><![CDATA[<a href="#" class="__peweproxy_keywords_button"></a>]]></param>
 		<param name="windowHTML">
 <![CDATA[
 	<style type="text/css">
 				a.__peweproxy_keywords_button{
-					background-image:url("${plugins-core:proxyurl}/FileSender/public/keywordsImages/icon_keywords.png");
+					background-image:url("${plugins-core:assets-path}/keywordsImages/icon_keywords.png");
 					display:block;
 					float:left;
 					height:21px;
@@ -48,12 +48,12 @@
 				div.__peweproxy_keywords_head{
 					height: 26px;
 					width: 433px;
-					background-image: url('${plugins-core:proxyurl}/FileSender/public/keywordsImages/keywords_top.png');
+					background-image: url('${plugins-core:assets-path}/keywordsImages/keywords_top.png');
 					float: left;
 				}
 
 				div.__peweproxy_keywords_body{
-					background-image:url("${plugins-core:proxyurl}/FileSender/public/keywordsImages/keywords_body.png");
+					background-image:url("${plugins-core:assets-path}/keywordsImages/keywords_body.png");
 					float:left;
 					padding:0 20px 0 16px;
 					width:397px;
@@ -62,7 +62,7 @@
 				div.__peweproxy_keywords_foot{
 					height: 15px;
 					width: 433px;
-					background-image: url('${plugins-core:proxyurl}/FileSender/public/keywordsImages/keywords_bottom.png');
+					background-image: url('${plugins-core:assets-path}/keywordsImages/keywords_bottom.png');
 					float: left;
 				}
 
@@ -73,7 +73,7 @@
 					top: 1px;
 					height: 22px;
 					width: 22px;
-					background-image: url('${plugins-core:proxyurl}/FileSender/public/keywordsImages/close_button.png');
+					background-image: url('${plugins-core:assets-path}/keywordsImages/close_button.png');
 					background-position: top;
 				}
 
@@ -146,7 +146,7 @@
 			</style>
 
 			<script type="text/javascript">
-				var peweproxy_keywords_htdocs_dir = '${plugins-core:proxyurl}/FileSender/public/keywordsImages';
+				var peweproxy_keywords_htdocs_dir = '${plugins-core:assets-path}/keywordsImages';
 			</script>
 
 			<div id="peweproxy_keywords">
