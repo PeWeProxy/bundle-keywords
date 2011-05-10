@@ -50,7 +50,7 @@ peweproxy.register_module('keywords', function($) {
 			},function(data){
 				response = $.trim(data);
 				if (response == 'OK'){
-					peweproxy_get_keywords();
+					get_keywords();
 				} else {
 					alert('Pri mazaní kľúčového slova nastala chyba.');
 				}
@@ -69,7 +69,7 @@ peweproxy.register_module('keywords', function($) {
 		$.post(peweproxy_url_keywords+'?action=editKeyWord',post_data, function(data){
 			response = $.trim(data);
 			if (response == 'OK'){
-				peweproxy_get_keywords()
+				get_keywords()
 			} else if (response == 'TERM_EXISTS'){
 				alert('Kľúčové slovo '+post_data.term+' už existuje');
 			} else {
