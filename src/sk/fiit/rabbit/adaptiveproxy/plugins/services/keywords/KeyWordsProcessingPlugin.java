@@ -13,7 +13,7 @@ import sk.fiit.peweproxy.messages.ModifiableHttpRequest;
 import sk.fiit.peweproxy.messages.ModifiableHttpResponse;
 import sk.fiit.peweproxy.services.content.ModifiableStringService;
 import sk.fiit.rabbit.adaptiveproxy.plugins.servicedefinitions.CouchDBProviderService;
-import sk.fiit.rabbit.adaptiveproxy.plugins.servicedefinitions.PostDataParserService;
+import sk.fiit.rabbit.adaptiveproxy.plugins.servicedefinitions.RequestDataParserService;
 import sk.fiit.rabbit.adaptiveproxy.plugins.services.bubble.BubbleMenuProcessingPlugin;
 
 public class KeyWordsProcessingPlugin extends BubbleMenuProcessingPlugin {
@@ -30,8 +30,8 @@ public class KeyWordsProcessingPlugin extends BubbleMenuProcessingPlugin {
 				content = this.getKeyWordsFromCouchDb(database, url);
 			}
 			
-			if(request.getServicesHandle().isServiceAvailable(PostDataParserService.class)) {
-				Map<String, String> postData = request.getServicesHandle().getService(PostDataParserService.class).getPostData();
+			if(request.getServicesHandle().isServiceAvailable(RequestDataParserService.class)) {
+				Map<String, String> postData = request.getServicesHandle().getService(RequestDataParserService.class).getDataFromPOST();
 				if (request.getRequestHeader().getRequestURI().contains("action=editKeyWord")) {
 					content = this.editKeyWordInCouchDb(database, url, postData.get("id"), postData.get("term"), postData.get("relevance"), postData.get("type"));
 				}
