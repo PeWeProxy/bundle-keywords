@@ -9,7 +9,7 @@
 	  	<lib>json-lib-2.4-jdk15.jar</lib>
 	  	<lib>json_simple-1.1.jar</lib>
 	  	<lib>gson-1.4.jar</lib>
-	  	<lib>couchdb4j-0.1.2.jar</lib>
+	  	<lib>jcouchdb-1.0.1-1.jar</lib>
 	</libraries>
 	<types>
 		<type>RequestProcessingPlugin</type>
