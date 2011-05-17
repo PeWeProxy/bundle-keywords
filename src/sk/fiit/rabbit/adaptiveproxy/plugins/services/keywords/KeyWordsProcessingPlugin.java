@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jcouchdb.db.Database;
-import org.json.simple.JSONObject;
+import org.svenson.JSON;
 
 import sk.fiit.peweproxy.messages.HttpMessageFactory;
 import sk.fiit.peweproxy.messages.HttpResponse;
@@ -117,9 +117,10 @@ public class KeyWordsProcessingPlugin extends BubbleMenuProcessingPlugin {
 	private String getKeyWordsFromCouchDb(Database couch, String url) {
 		HashMap page = couch.getDocument(HashMap.class, url);
 		
-		JSONObject response = new JSONObject();
-		response.put("keywords", page.get("terms"));
+		Map keywords = new HashMap();
+		keywords.put("keywords", page.get("terms"));
+		String json = JSON.defaultJSON().forValue(keywords);
 		
-		return response.toJSONString();
+		return(json);
 	}
 }
