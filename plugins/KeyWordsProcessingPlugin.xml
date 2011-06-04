@@ -56,7 +56,7 @@
 					float:left;
 					padding:0 20px 0 16px;
 					width:389px;
-					height: 550px;
+					max-height: 550px;
 					overflow: auto;
 				}
 
