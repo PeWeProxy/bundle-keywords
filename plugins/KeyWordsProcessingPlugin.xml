@@ -55,7 +55,9 @@
 					background-image:url("${plugins-core:assets-path}/keywordsImages/keywords_body.png");
 					float:left;
 					padding:0 20px 0 16px;
-					width:397px;
+					width:389px;
+					height: 550px;
+					overflow: auto;
 				}
 
 				div.__peweproxy_keywords_foot{
@@ -81,7 +83,7 @@
 				}
 
 				div#peweproxy_keywords_content{
-					width: 397px;
+					width: 392px;
 				}
 				div#peweproxy_keywords_content table {
 					color: #2F3F4F;
@@ -154,12 +156,12 @@
 				</div>
 
 				<div class="__peweproxy_keywords_body">
-					<div>
+					<!--<div>
 						<span class="header">
 							<span class="left_floated">Kľúčové slová stránky</span>
 							<span class="right_floated language_bar"><a href="#" class="active" onclick="return false;">SK</a> | <a onclick="return false;" href="#">EN</a></span>
 						</span>
-					</div>
+					</div>-->
 					<div id="peweproxy_keywords_content">
 						<div class="__peweproxy_keyword">
 							<table>
