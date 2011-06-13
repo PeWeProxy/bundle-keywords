@@ -19,6 +19,8 @@
 		<param name="generateResponse">true</param>
 		<param name="scriptUrl">${plugins-core:assets-path}/peweproxy_keywords.js</param>
 		<param name="buttonHTML"><![CDATA[<a href="#" class="__peweproxy_keywords_button"></a>]]></param>
+		<param name="preferenceNamespace">keywords</param>
+		<param name="preferenceLabel">Kľúčové slová</param>
 		<param name="windowHTML">
 <![CDATA[
 	<style type="text/css">
